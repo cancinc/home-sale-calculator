@@ -362,7 +362,7 @@ export default function HomeSaleCalculator() {
   const netProfit = numSale - numMortgage - totalExpenses;
   const enabledExpenses = expenses
     .map((e) => ({ id: e.id, label: e.label, amount: calcExpenseAmount(e), type: e.type, value: e.value }))
-    .filter((e) => e.enabled && e.amount > 0);
+    .filter((e) => e.amount > 0);
 
   const addExpense = () => {
     setExpenses([
