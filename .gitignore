@@ -13,6 +13,10 @@ dist-ssr
 *.local
 
 .superpowers/
+docs/
+README.md
+github-pages-deploy-instructions.md
+home-sale-calculator-handoff.md
 
 # Editor directories and files
 .vscode/*
