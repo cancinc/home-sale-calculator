@@ -67,6 +67,278 @@ const PRESET_EXPENSES = [
   { label: "Staging", type: "fixed", value: 2000 },
 ];
 
+function PrintSummary({ salePrice, mortgageBalance, enabledExpenses, netProfit }) {
+  const date = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const profitColor = netProfit > 0 ? "#6ee7b7" : netProfit < 0 ? "#f87171" : "#f0ede8";
+  const profitLabel = netProfit > 0 ? "NET PROFIT" : netProfit < 0 ? "NET LOSS" : "BREAK EVEN";
+
+  return (
+    <div
+      className="print-only"
+      style={{
+        printColorAdjust: "exact",
+        WebkitPrintColorAdjust: "exact",
+        background: "#0f0e0c",
+        color: "#f0ede8",
+        fontFamily: "'DM Sans', sans-serif",
+        padding: "0",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          paddingBottom: "20px",
+          marginBottom: "28px",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "10px",
+              letterSpacing: "0.15em",
+              color: "rgba(255,200,80,0.7)",
+              textTransform: "uppercase",
+              marginBottom: "6px",
+            }}
+          >
+            Real Estate
+          </div>
+          <div
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "28px",
+              fontWeight: 700,
+              color: "#f0ede8",
+              lineHeight: 1.1,
+            }}
+          >
+            Home Sale
+            <br />
+            <span style={{ color: "rgba(255,200,80,0.9)" }}>Profit Calculator</span>
+          </div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "10px",
+              color: "rgba(240,237,232,0.35)",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            Prepared on
+          </div>
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "13px",
+              color: "rgba(240,237,232,0.6)",
+              marginTop: "3px",
+            }}
+          >
+            {date}
+          </div>
+        </div>
+      </div>
+
+      {/* Core figures */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "24px" }}>
+        <div
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "10px",
+            padding: "14px",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "9px",
+              letterSpacing: "0.12em",
+              color: "rgba(255,200,80,0.6)",
+              textTransform: "uppercase",
+              marginBottom: "6px",
+            }}
+          >
+            Sale Price
+          </div>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "20px", fontWeight: 700 }}>
+            {formatCurrency(salePrice)}
+          </div>
+        </div>
+        <div
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "10px",
+            padding: "14px",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "9px",
+              letterSpacing: "0.12em",
+              color: "rgba(255,200,80,0.6)",
+              textTransform: "uppercase",
+              marginBottom: "6px",
+            }}
+          >
+            Mortgage Payoff
+          </div>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "20px", fontWeight: 700 }}>
+            {formatCurrency(mortgageBalance)}
+          </div>
+        </div>
+      </div>
+
+      {/* Expenses */}
+      {enabledExpenses.length > 0 && (
+        <div
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
+            padding: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "9px",
+              letterSpacing: "0.12em",
+              color: "rgba(255,200,80,0.6)",
+              textTransform: "uppercase",
+              marginBottom: "16px",
+            }}
+          >
+            Expenses & Deductions
+          </div>
+          {enabledExpenses.map((exp, i) => (
+            <div
+              key={exp.label}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "13px",
+                paddingBottom: i < enabledExpenses.length - 1 ? "10px" : 0,
+                marginBottom: i < enabledExpenses.length - 1 ? "10px" : 0,
+                borderBottom:
+                  i < enabledExpenses.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              }}
+            >
+              <span style={{ color: "rgba(240,237,232,0.5)" }}>
+                {exp.label}
+                {exp.type === "percent" && (
+                  <span
+                    style={{
+                      fontFamily: "'DM Mono', monospace",
+                      fontSize: "11px",
+                      marginLeft: "6px",
+                      opacity: 0.6,
+                    }}
+                  >
+                    ({exp.value}% of sale)
+                  </span>
+                )}
+              </span>
+              <span style={{ fontFamily: "'DM Mono', monospace", color: "#f87171" }}>
+                -{formatCurrency(exp.amount ?? 0)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Net profit */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)",
+          border: `1px solid ${
+            netProfit > 0
+              ? "rgba(110,231,183,0.25)"
+              : netProfit < 0
+              ? "rgba(248,113,113,0.25)"
+              : "rgba(255,255,255,0.1)"
+          }`,
+          borderRadius: "12px",
+          padding: "24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "9px",
+              letterSpacing: "0.15em",
+              color: profitColor,
+              opacity: 0.6,
+              textTransform: "uppercase",
+              marginBottom: "8px",
+            }}
+          >
+            {profitLabel}
+          </div>
+          <div
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "42px",
+              fontWeight: 700,
+              color: profitColor,
+              lineHeight: 1,
+            }}
+          >
+            {salePrice > 0 ? formatCurrency(Math.abs(netProfit)) : "—"}
+          </div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "12px",
+              color: "rgba(240,237,232,0.35)",
+              marginBottom: "4px",
+            }}
+          >
+            Return on sale
+          </div>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "22px", color: profitColor }}>
+            {salePrice > 0 ? ((netProfit / salePrice) * 100).toFixed(1) + "%" : "—"}
+          </div>
+        </div>
+      </div>
+
+      {/* Disclaimer */}
+      <div
+        style={{
+          marginTop: "20px",
+          textAlign: "center",
+          fontFamily: "'DM Mono', monospace",
+          fontSize: "10px",
+          color: "rgba(240,237,232,0.2)",
+        }}
+      >
+        Estimates only. Consult a real estate professional for exact figures.
+      </div>
+    </div>
+  );
+}
+
 export default function HomeSaleCalculator() {
   const [salePrice, setSalePrice] = useState("");
   const [mortgageBalance, setMortgageBalance] = useState("");
@@ -88,6 +360,9 @@ export default function HomeSaleCalculator() {
 
   const totalExpenses = expenses.reduce((sum, e) => sum + calcExpenseAmount(e), 0);
   const netProfit = numSale - numMortgage - totalExpenses;
+  const enabledExpenses = expenses
+    .filter((e) => e.enabled && calcExpenseAmount(e) > 0)
+    .map((e) => ({ label: e.label, amount: calcExpenseAmount(e), type: e.type, value: e.value }));
 
   const addExpense = () => {
     setExpenses([
@@ -129,10 +404,18 @@ export default function HomeSaleCalculator() {
     netProfit > 0 ? "NET PROFIT" : netProfit < 0 ? "NET LOSS" : "BREAK EVEN";
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0f0e0c",
+    <>
+      <PrintSummary
+        salePrice={numSale}
+        mortgageBalance={numMortgage}
+        enabledExpenses={enabledExpenses}
+        netProfit={netProfit}
+      />
+      <div
+        className="screen-only"
+        style={{
+          minHeight: "100vh",
+          background: "#0f0e0c",
         backgroundImage:
           "radial-gradient(ellipse at 20% 0%, rgba(255,200,80,0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(100,200,150,0.05) 0%, transparent 60%)",
         fontFamily: "'DM Sans', sans-serif",
@@ -152,6 +435,13 @@ export default function HomeSaleCalculator() {
         .expense-row:hover .remove-btn { opacity: 1 !important; }
         .preset-chip:hover { background: rgba(255,200,80,0.15) !important; border-color: rgba(255,200,80,0.5) !important; }
         .add-btn:hover { background: rgba(255,200,80,0.12) !important; }
+        .print-only { display: none; }
+        @media print {
+          .screen-only { display: none !important; }
+          .print-only { display: block !important; }
+          body, html { background: #0f0e0c !important; margin: 0; }
+          @page { margin: 20mm; }
+        }
       `}</style>
 
       <div style={{ maxWidth: "680px", margin: "0 auto" }}>
@@ -579,6 +869,28 @@ export default function HomeSaleCalculator() {
           )}
         </div>
 
+        {numSale > 0 && (
+          <button
+            onClick={() => window.print()}
+            style={{
+              display: "block",
+              marginTop: "16px",
+              marginLeft: "auto",
+              background: "rgba(255,200,80,0.08)",
+              border: "1px solid rgba(255,200,80,0.3)",
+              borderRadius: "10px",
+              padding: "10px 20px",
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "12px",
+              color: "rgba(255,200,80,0.8)",
+              letterSpacing: "0.06em",
+              cursor: "pointer",
+            }}
+          >
+            ↓ Print Summary
+          </button>
+        )}
+
         <div
           style={{
             marginTop: "16px",
@@ -592,5 +904,6 @@ export default function HomeSaleCalculator() {
         </div>
       </div>
     </div>
+    </>
   );
 }
