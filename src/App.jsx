@@ -228,7 +228,7 @@ function PrintSummary({ salePrice, mortgageBalance, enabledExpenses, netProfit }
           </div>
           {enabledExpenses.map((exp, i) => (
             <div
-              key={exp.label}
+              key={exp.id}
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -361,8 +361,8 @@ export default function HomeSaleCalculator() {
   const totalExpenses = expenses.reduce((sum, e) => sum + calcExpenseAmount(e), 0);
   const netProfit = numSale - numMortgage - totalExpenses;
   const enabledExpenses = expenses
-    .filter((e) => e.enabled && calcExpenseAmount(e) > 0)
-    .map((e) => ({ label: e.label, amount: calcExpenseAmount(e), type: e.type, value: e.value }));
+    .map((e) => ({ id: e.id, label: e.label, amount: calcExpenseAmount(e), type: e.type, value: e.value }))
+    .filter((e) => e.enabled && e.amount > 0);
 
   const addExpense = () => {
     setExpenses([
@@ -405,12 +405,14 @@ export default function HomeSaleCalculator() {
 
   return (
     <>
-      <PrintSummary
-        salePrice={numSale}
-        mortgageBalance={numMortgage}
-        enabledExpenses={enabledExpenses}
-        netProfit={netProfit}
-      />
+      {numSale > 0 && (
+        <PrintSummary
+          salePrice={numSale}
+          mortgageBalance={numMortgage}
+          enabledExpenses={enabledExpenses}
+          netProfit={netProfit}
+        />
+      )}
       <div
         className="screen-only"
         style={{
@@ -871,6 +873,7 @@ export default function HomeSaleCalculator() {
 
         {numSale > 0 && (
           <button
+            type="button"
             onClick={() => window.print()}
             style={{
               display: "block",
